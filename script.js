@@ -29,111 +29,71 @@ const locations = {
 let map = L.map('map', { zoomControl: false, attributionControl: false }).setView([20, 0], 3);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-let planeMarker, timerInterval, flightPath, isPaused = false;
-let secondsLeft = 0, totalSeconds = 0, totalDist = 0;
+let planeMarker, flightPath, isPaused = false;
+let secondsLeft = 0, totalSeconds = 0, totalDist = 0, endTime = 0, pausedRemaining = 0;
 
-// Manifest Logic
-const taskList = document.getElementById('taskList');
-const newTaskInput = document.getElementById('newTask');
-const addTaskBtn = document.getElementById('addTaskBtn');
+let flightLogs = JSON.parse(localStorage.getItem('flightFocusLogs')) || [];
+function saveFlight(dur) { flightLogs.push({ ts: Date.now(), dur }); localStorage.setItem('flightFocusLogs', JSON.stringify(flightLogs)); displayLogs(); }
+function formatDur(s) { let h = Math.floor(s/3600), m = Math.floor((s%3600)/60); return h>0?`${h}h ${m}m`:`${m}m`; }
+function displayLogs() {
+    let now = new Date(), startDay = new Date(now.setHours(0,0,0,0)).getTime();
+    let startWeek = new Date(now.setDate(now.getDate()-now.getDay())).getTime();
+    let startMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+    let startYear = new Date(now.getFullYear(), 0, 1).getTime();
+    let t = { d:0, w:0, m:0, y:0, a:0 };
+    flightLogs.forEach(l => { t.a+=l.dur; if(l.ts>=startYear) t.y+=l.dur; if(l.ts>=startMonth) t.m+=l.dur; if(l.ts>=startWeek) t.w+=l.dur; if(l.ts>=startDay) t.d+=l.dur; });
+    document.getElementById('statDay').innerText = formatDur(t.d); document.getElementById('statWeek').innerText = formatDur(t.w);
+    document.getElementById('statMonth').innerText = formatDur(t.m); document.getElementById('statYear').innerText = formatDur(t.y);
+    document.getElementById('statAll').innerText = formatDur(t.a);
+}
+document.getElementById('clearLogsBtn').onclick = () => { if(confirm("Reset History?")){ flightLogs=[]; localStorage.removeItem('flightFocusLogs'); displayLogs(); } };
+displayLogs();
 
-addTaskBtn.addEventListener('click', () => {
-    const taskText = newTaskInput.value.trim();
-    if (taskText) {
-        const li = document.createElement('li');
-        li.innerHTML = `
-            <div class="task-content">
-                <input type="checkbox">
-                <span>${taskText}</span>
-            </div>
-            <button class="delete-task-btn" title="Remove Task">&times;</button>
-        `;
-        li.querySelector('.delete-task-btn').addEventListener('click', () => li.remove());
-        taskList.appendChild(li);
-        newTaskInput.value = '';
+document.getElementById('addTaskBtn').onclick = () => {
+    let inp = document.getElementById('newTask'), val = inp.value.trim();
+    if(val){
+        let li = document.createElement('li'); li.innerHTML = `<div class="task-content"><input type="checkbox"><span>${val}</span></div><button class="delete-task-btn">&times;</button>`;
+        li.querySelector('.delete-task-btn').onclick = () => li.remove();
+        document.getElementById('taskList').appendChild(li); inp.value='';
     }
-});
-newTaskInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') addTaskBtn.click(); });
+};
 
-// Utils
-function getBearing(c1, c2) {
-    const lat1 = c1[0] * Math.PI / 180;
-    const lat2 = c2[0] * Math.PI / 180;
-    const dLon = (c2[1] - c1[1]) * Math.PI / 180;
-    const y = Math.sin(dLon) * Math.cos(lat2);
-    const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon);
-    return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
-}
-
-function getDistKM(c1, c2) {
-    const R = 6371; 
-    const dLat = (c2[0]-c1[0])*Math.PI/180;
-    const dLon = (c2[1]-c1[1])*Math.PI/180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(c1[0]*Math.PI/180)*Math.cos(c2[0]*Math.PI/180)*Math.sin(dLon/2)**2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
+function getBearing(c1, c2) { let l1=c1[0]*Math.PI/180, l2=c2[0]*Math.PI/180, dLon=(c2[1]-c1[1])*Math.PI/180; let y=Math.sin(dLon)*Math.cos(l2), x=Math.cos(l1)*Math.sin(l2)-Math.sin(l1)*Math.cos(l2)*Math.cos(dLon); return (Math.atan2(y,x)*180/Math.PI+360)%360; }
+function getDist(c1, c2) { let R=6371, dLat=(c2[0]-c1[0])*Math.PI/180, dLon=(c2[1]-c1[1])*Math.PI/180; let a=Math.sin(dLat/2)**2+Math.cos(c1[0]*Math.PI/180)*Math.cos(c2[0]*Math.PI/180)*Math.sin(dLon/2)**2; return R*2*Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); }
 
 function updateUI() {
-    const hours = Math.floor(secondsLeft / 3600);
-    const mins = Math.floor((secondsLeft % 3600) / 60);
-    const secs = secondsLeft % 60;
-    
-    let timeText = hours > 0 ? `${hours}h ${mins}m ${secs}s` : `${mins}m ${secs}s`;
-    document.getElementById('timeRemaining').innerText = timeText;
-    
-    const distLeft = Math.round(totalDist * (secondsLeft / totalSeconds));
-    document.getElementById('distRemaining').innerText = `${distLeft} km`;
-    
-    const now = new Date();
-    document.getElementById('currentTime').innerText = now.getHours().toString().padStart(2,'0')+":"+now.getMinutes().toString().padStart(2,'0');
+    if(!isPaused) secondsLeft = Math.max(0, Math.round((endTime - Date.now())/1000));
+    let h=Math.floor(secondsLeft/3600), m=Math.floor((secondsLeft%3600)/60), s=secondsLeft%60;
+    document.getElementById('timeRemaining').innerText = h>0?`${h}h ${m}m ${s}s`:`${m}m ${s}s`;
+    document.getElementById('distRemaining').innerText = `${Math.round(totalDist*(secondsLeft/totalSeconds))} km`;
+    let now=new Date(); document.getElementById('currentTime').innerText = now.getHours().toString().padStart(2,'0')+":"+now.getMinutes().toString().padStart(2,'0');
 }
 
-// Start
-document.getElementById('startBtn').addEventListener('click', () => {
-    const startName = document.getElementById('startCity').value;
-    const endName = document.getElementById('endCity').value;
-    const start = locations[startName];
-    const end = locations[endName];
-    if (!start || !end) return alert("Select valid cities!");
-
+document.getElementById('startBtn').onclick = () => {
+    let sCity = document.getElementById('startCity').value, eCity = document.getElementById('endCity').value;
+    let s = locations[sCity], e = locations[eCity];
+    if(!s || !e) return alert("Invalid Cities");
     document.getElementById('setupPanel').classList.add('hidden');
     document.getElementById('ifeBar').classList.remove('hidden');
-
-    totalDist = getDistKM(start, end);
-    const rotation = getBearing(start, end);
-    secondsLeft = Math.round((totalDist/880)*3600);
-    totalSeconds = secondsLeft;
-
-    if (flightPath) map.removeLayer(flightPath);
-    flightPath = L.polyline([start, end], {color: '#00ffff', weight: 2, dashArray: '10, 10', opacity: 0.5}).addTo(map);
-
-    if (planeMarker) map.removeLayer(planeMarker);
-    const planeSVG = `
-        <div class="plane-icon" style="transform: rotate(${rotation - 90}deg);">
-            <svg viewBox="0 0 24 24">
-                <path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"></path>
-            </svg>
-        </div>`;
-
-    planeMarker = L.marker(start, { icon: L.divIcon({ className:'p', html: planeSVG, iconSize:[45,45], iconAnchor:[22,22] })}).addTo(map);
-
-    map.flyTo(start, 7);
-
-    timerInterval = setInterval(() => {
-        if (!isPaused) {
-            secondsLeft--;
-            const progress = 1 - (secondsLeft/totalSeconds);
-            const lat = start[0] + (end[0]-start[0])*progress;
-            const lng = start[1] + (end[1]-start[1])*progress;
-            planeMarker.setLatLng([lat, lng]);
-            map.panTo([lat, lng]);
-            updateUI();
-            if (secondsLeft <= 0) { clearInterval(timerInterval); alert("Arrival."); location.reload(); }
+    totalDist = getDist(s, e); let rot = getBearing(s, e);
+    totalSeconds = Math.round((totalDist/880)*3600); endTime = Date.now() + totalSeconds*1000; isPaused = false;
+    if(flightPath) map.removeLayer(flightPath); flightPath = L.polyline([s,e], {color:'#00ffff',weight:2,dashArray:'10,10',opacity:0.5}).addTo(map);
+    if(planeMarker) map.removeLayer(planeMarker);
+    planeMarker = L.marker(s, {icon: L.divIcon({className:'p', html:`<div class="plane-icon" style="transform:rotate(${rot-90}deg)"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"></path></svg></div>`, iconSize:[45,45], iconAnchor:[22,22]})}).addTo(map);
+    map.flyTo(s, 7);
+    setInterval(() => {
+        if(!isPaused && endTime){
+            updateUI(); let progress = 1-(secondsLeft/totalSeconds);
+            let lat = s[0]+(e[0]-s[0])*progress, lng = s[1]+(e[1]-s[1])*progress;
+            planeMarker.setLatLng([lat,lng]); map.panTo([lat,lng]);
+            if(secondsLeft <= 0){ saveFlight(totalSeconds); alert("Arrival."); location.reload(); }
         }
     }, 1000);
-});
+};
 
-document.getElementById('pauseBtn').addEventListener('click', () => {
+document.getElementById('pauseBtn').onclick = () => {
     isPaused = !isPaused;
+    if(isPaused) pausedRemaining = endTime - Date.now();
+    else endTime = Date.now() + pausedRemaining;
     document.getElementById('pauseBtn').innerText = isPaused ? "▶" : "⏸";
-});
+};
