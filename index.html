@@ -18,6 +18,17 @@
         </div>
     </div>
 
+    <div id="logContainer" class="log-container">
+        <h3>FLIGHT LOGS</h3>
+        <div class="stat-row"><span>Today:</span> <span id="statDay">0m</span></div>
+        <div class="stat-row"><span>This Week:</span> <span id="statWeek">0m</span></div>
+        <div class="stat-row"><span>This Month:</span> <span id="statMonth">0m</span></div>
+        <div class="stat-row"><span>This Year:</span> <span id="statYear">0m</span></div>
+        <hr>
+        <div class="stat-row total"><span>Total Flying Time:</span> <span id="statAll">0m</span></div>
+        <button id="clearLogsBtn">Reset All History</button>
+    </div>
+
     <div id="setupPanel" class="setup-panel">
         <h1>✈️ Flight Focus</h1>
         <div class="input-group">
@@ -59,12 +70,10 @@
             <span class="label">Time Remaining</span>
             <span id="timeRemaining" class="value">0h 0m 0s</span>
         </div>
-
         <div class="ife-center">
             <span id="currentTime" class="clock">00:00</span>
             <button id="pauseBtn">⏸</button>
         </div>
-
         <div class="ife-stat-block text-right">
             <span class="label">Distance Remaining</span>
             <span id="distRemaining" class="value">0 km</span>
