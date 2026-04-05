@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Focus</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="todoContainer" class="todo-container">
+        <h3>FLIGHT MANIFEST</h3>
+        <ul id="taskList"></ul>
+        <div class="todo-input-group">
+            <input type="text" id="newTask" placeholder="Add task...">
+            <button id="addTaskBtn">+</button>
+        </div>
+    </div>
+
+    <div id="setupPanel" class="setup-panel">
+        <h1>✈️ Flight Focus</h1>
+        <div class="input-group">
+            <input type="text" id="startCity" list="cityOptions" placeholder="Departure City">
+            <input type="text" id="endCity" list="cityOptions" placeholder="Arrival City">
+            <datalist id="cityOptions">
+                <option value="Abu Dhabi"><option value="Addis Ababa"><option value="Amsterdam">
+                <option value="Auckland"><option value="Bangkok"><option value="Barcelona">
+                <option value="Beijing"><option value="Bengaluru"><option value="Berlin">
+                <option value="Bogota"><option value="Boston"><option value="Brussels">
+                <option value="Buenos Aires"><option value="Cairo"><option value="Cape Town">
+                <option value="Casablanca"><option value="Chennai"><option value="Chicago">
+                <option value="Colombo"><option value="Copenhagen"><option value="Doha">
+                <option value="Dubai"><option value="Dublin"><option value="Frankfurt">
+                <option value="Hanoi"><option value="Helsinki"><option value="Hong Kong">
+                <option value="Honolulu"><option value="Istanbul"><option value="Jakarta">
+                <option value="Johannesburg"><option value="Kathmandu"><option value="Kolkata">
+                <option value="Kuala Lumpur"><option value="Kuwait City"><option value="Lagos">
+                <option value="Lima"><option value="Lisbon"><option value="London">
+                <option value="Los Angeles"><option value="Madrid"><option value="Maldives">
+                <option value="Mangaluru"><option value="Manila"><option value="Mauritius">
+                <option value="Melbourne"><option value="Mexico City"><option value="Miami">
+                <option value="Moscow"><option value="Mumbai"><option value="Nairobi">
+                <option value="New Delhi"><option value="New York"><option value="Oslo">
+                <option value="Panaji"><option value="Paris"><option value="Prague">
+                <option value="Rio de Janeiro"><option value="Rome"><option value="San Francisco">
+                <option value="Santiago"><option value="Sao Paulo"><option value="Seoul">
+                <option value="Singapore"><option value="Stockholm"><option value="Sydney">
+                <option value="Taipei"><option value="Tel Aviv"><option value="Tokyo">
+                <option value="Toronto"><option value="Vancouver"><option value="Vienna">
+                <option value="Warsaw"><option value="Zurich">
+            </datalist>
+        </div>
+        <button id="startBtn">Begin Focus Flight</button>
+    </div>
+
+    <div id="ifeBar" class="ife-bar hidden">
+        <div class="ife-stat-block">
+            <span class="label">Time Remaining</span>
+            <span id="timeRemaining" class="value">0h 0m 0s</span>
+        </div>
+
+        <div class="ife-center">
+            <span id="currentTime" class="clock">00:00</span>
+            <button id="pauseBtn">⏸</button>
+        </div>
+
+        <div class="ife-stat-block text-right">
+            <span class="label">Distance Remaining</span>
+            <span id="distRemaining" class="value">0 km</span>
+        </div>
+    </div>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
