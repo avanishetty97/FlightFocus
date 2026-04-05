@@ -26,6 +26,7 @@ const locations = {
     "Warsaw": [52.2297, 21.0122], "Zurich": [47.3769, 8.5417]
 };
 
+
 let map = L.map('map', { zoomControl: false, attributionControl: false }).setView([20, 0], 3);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
