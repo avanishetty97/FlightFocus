@@ -19,11 +19,26 @@
     </div>
 
     <div id="logContainer" class="log-container">
-        <h3>FLIGHT LOGS</h3>
-        <div class="stat-row"><span>Today:</span> <span id="statDay">0m</span></div>
-        <div class="stat-row"><span>This Week:</span> <span id="statWeek">0m</span></div>
-        <div class="stat-row"><span>This Month:</span> <span id="statMonth">0m</span></div>
-        <div class="stat-row"><span>This Year:</span> <span id="statYear">0m</span></div>
+        <div id="mainLogs">
+            <h3>FLIGHT LOGS</h3>
+            <div class="stat-row"><span>Today:</span> <span id="statDay">0m</span></div>
+            <div class="stat-row"><span>This Week:</span> <span id="statWeek">0m</span></div>
+            <div class="stat-row"><span>This Month:</span> <span id="statMonth">0m</span></div>
+            <hr>
+            <button id="toggleInsightsBtn">View Detailed Trends</button>
+        </div>
+
+        <div id="insightsPanel" class="hidden">
+            <h3>FOCUS TRENDS</h3>
+            <div class="insights-tabs">
+                <button id="tabDay" class="tab-btn active">Days</button>
+                <button id="tabWeek" class="tab-btn">Weeks</button>
+                <button id="tabMonth" class="tab-btn">Months</button>
+            </div>
+            <div id="trendsList" class="monthly-list"></div>
+            <button id="backToLogsBtn">Back to Stats</button>
+        </div>
+
         <hr>
         <div class="stat-row total"><span>Total Flying Time:</span> <span id="statAll">0m</span></div>
         <button id="clearLogsBtn">Reset All History</button>
