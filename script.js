@@ -7,22 +7,22 @@ const locations = {
     "Casablanca": [33.5731, -7.5898], "Chennai": [13.0827, 80.2707], "Chicago": [41.8781, -87.6298],
     "Colombo": [6.9271, 79.8612], "Copenhagen": [55.6761, 12.5683], "Doha": [25.2854, 51.5310],
     "Dubai": [25.2048, 55.2708], "Dublin": [53.3498, -6.2603], "Frankfurt": [50.1109, 8.6821],
-    "Gaza": [31.5017, 34.4668], "Hanoi": [21.0285, 105.8542], "Helsinki": [60.1699, 24.9384], 
-    "Hong Kong": [22.3193, 114.1694], "Honolulu": [21.3069, -157.8583], "Istanbul": [41.0082, 28.9784], 
-    "Jakarta": [-6.2088, 106.8456], "Johannesburg": [-26.2041, 28.0473], "Kathmandu": [27.7172, 85.3240], 
-    "Kolkata": [22.5726, 88.3639], "Kuala Lumpur": [3.1390, 101.6869], "Kuwait City": [29.3759, 47.9774], 
-    "Lagos": [6.5244, 3.3792], "Lima": [-12.0464, -77.0428], "Lisbon": [38.7223, -9.1393], 
-    "London": [51.5074, -0.1278], "Los Angeles": [34.0522, -118.2437], "Madrid": [40.4168, -3.7038], 
-    "Maldives": [4.1755, 73.5093], "Mangaluru": [12.9141, 74.8560], "Manila": [14.5995, 120.9842], 
-    "Mauritius": [-20.3484, 57.5522], "Melbourne": [-37.8136, 144.9631], "Mexico City": [19.4326, -99.1332], 
-    "Miami": [25.7617, -80.1918], "Moscow": [55.7558, 37.6173], "Mumbai": [19.0760, 72.8777], 
-    "Nairobi": [-1.2921, 36.8219], "New Delhi": [28.6139, 77.2090], "New York": [40.7128, -74.0060], 
-    "Oslo": [59.9139, 10.7522], "Panaji": [15.4909, 73.8278], "Paris": [48.8566, 2.3522], 
-    "Prague": [50.0755, 14.4378], "Rio de Janeiro": [-22.9068, -43.1729], "Rome": [41.9028, 12.4964], 
-    "San Francisco": [37.7749, -122.4194], "Santiago": [-33.4489, -70.6693], "Sao Paulo": [-23.5505, -46.6333], 
-    "Seoul": [37.5665, 126.9780], "Singapore": [1.3521, 103.8198], "Stockholm": [59.3293, 18.0686], 
-    "Sydney": [-33.8688, 151.2093], "Taipei": [25.0330, 121.5654], "Tokyo": [35.6895, 139.6917], 
-    "Toronto": [43.6532, -79.3832], "Vancouver": [49.2827, -123.1207], "Vienna": [48.2082, 16.3738], 
+    "Gaza": [31.5017, 34.4668], "Hanoi": [21.0285, 105.8542], "Helsinki": [60.1699, 24.9384],
+    "Hong Kong": [22.3193, 114.1694], "Honolulu": [21.3069, -157.8583], "Istanbul": [41.0082, 28.9784],
+    "Jakarta": [-6.2088, 106.8456], "Johannesburg": [-26.2041, 28.0473], "Kathmandu": [27.7172, 85.3240],
+    "Kolkata": [22.5726, 88.3639], "Kuala Lumpur": [3.1390, 101.6869], "Kuwait City": [29.3759, 47.9774],
+    "Lagos": [6.5244, 3.3792], "Lima": [-12.0464, -77.0428], "Lisbon": [38.7223, -9.1393],
+    "London": [51.5074, -0.1278], "Los Angeles": [34.0522, -118.2437], "Madrid": [40.4168, -3.7038],
+    "Maldives": [4.1755, 73.5093], "Mangaluru": [12.9141, 74.8560], "Manila": [14.5995, 120.9842],
+    "Mauritius": [-20.3484, 57.5522], "Melbourne": [-37.8136, 144.9631], "Mexico City": [19.4326, -99.1332],
+    "Miami": [25.7617, -80.1918], "Moscow": [55.7558, 37.6173], "Mumbai": [19.0760, 72.8777],
+    "Nairobi": [-1.2921, 36.8219], "New Delhi": [28.6139, 77.2090], "New York": [40.7128, -74.0060],
+    "Oslo": [59.9139, 10.7522], "Panaji": [15.4909, 73.8278], "Paris": [48.8566, 2.3522],
+    "Prague": [50.0755, 14.4378], "Rio de Janeiro": [-22.9068, -43.1729], "Rome": [41.9028, 12.4964],
+    "San Francisco": [37.7749, -122.4194], "Santiago": [-33.4489, -70.6693], "Sao Paulo": [-23.5505, -46.6333],
+    "Seoul": [37.5665, 126.9780], "Singapore": [1.3521, 103.8198], "Stockholm": [59.3293, 18.0686],
+    "Sydney": [-33.8688, 151.2093], "Taipei": [25.0330, 121.5654], "Tokyo": [35.6895, 139.6917],
+    "Toronto": [43.6532, -79.3832], "Vancouver": [49.2827, -123.1207], "Vienna": [48.2082, 16.3738],
     "Warsaw": [52.2297, 21.0122], "Zurich": [47.3769, 8.5417]
 };
 
@@ -33,21 +33,76 @@ let planeMarker, flightPath, isPaused = false;
 let secondsLeft = 0, totalSeconds = 0, totalDist = 0, endTime = 0, pausedRemaining = 0;
 
 let flightLogs = JSON.parse(localStorage.getItem('flightFocusLogs')) || [];
-function saveFlight(dur) { flightLogs.push({ ts: Date.now(), dur }); localStorage.setItem('flightFocusLogs', JSON.stringify(flightLogs)); displayLogs(); }
-function formatDur(s) { let h = Math.floor(s/3600), m = Math.floor((s%3600)/60); return h>0?`${h}h ${m}m`:`${m}m`; }
+function saveFlight(dur) { 
+    flightLogs.push({ ts: Date.now(), dur }); 
+    localStorage.setItem('flightFocusLogs', JSON.stringify(flightLogs)); 
+    displayLogs(); 
+}
+function formatDur(s) { let h = Math.floor(s/3600), m = Math.floor((s%3600)/60); return h > 0 ? `${h}h ${m}m` : `${m}m`; }
+
 function displayLogs() {
     let now = new Date(), startDay = new Date(now.setHours(0,0,0,0)).getTime();
     let startWeek = new Date(now.setDate(now.getDate()-now.getDay())).getTime();
     let startMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
     let startYear = new Date(now.getFullYear(), 0, 1).getTime();
     let t = { d:0, w:0, m:0, y:0, a:0 };
-    flightLogs.forEach(l => { t.a+=l.dur; if(l.ts>=startYear) t.y+=l.dur; if(l.ts>=startMonth) t.m+=l.dur; if(l.ts>=startWeek) t.w+=l.dur; if(l.ts>=startDay) t.d+=l.dur; });
-    document.getElementById('statDay').innerText = formatDur(t.d); document.getElementById('statWeek').innerText = formatDur(t.w);
-    document.getElementById('statMonth').innerText = formatDur(t.m); document.getElementById('statYear').innerText = formatDur(t.y);
+    flightLogs.forEach(l => { 
+        t.a+=l.dur; 
+        if(l.ts>=startYear) t.y+=l.dur; 
+        if(l.ts>=startMonth) t.m+=l.dur; 
+        if(l.ts>=startWeek) t.w+=l.dur; 
+        if(l.ts>=startDay) t.d+=l.dur; 
+    });
+    document.getElementById('statDay').innerText = formatDur(t.d);
+    document.getElementById('statWeek').innerText = formatDur(t.w);
+    document.getElementById('statMonth').innerText = formatDur(t.m);
+    document.getElementById('statYear').innerText = formatDur(t.y);
     document.getElementById('statAll').innerText = formatDur(t.a);
 }
-document.getElementById('clearLogsBtn').onclick = () => { if(confirm("Reset History?")){ flightLogs=[]; localStorage.removeItem('flightFocusLogs'); displayLogs(); } };
-displayLogs();
+
+document.getElementById('toggleInsightsBtn').onclick = () => {
+    document.getElementById('mainLogs').classList.add('hidden');
+    document.getElementById('insightsPanel').classList.remove('hidden');
+    generateTrends('day');
+};
+document.getElementById('backToLogsBtn').onclick = () => {
+    document.getElementById('insightsPanel').classList.add('hidden');
+    document.getElementById('mainLogs').classList.remove('hidden');
+};
+document.getElementById('tabDay').onclick = () => generateTrends('day');
+document.getElementById('tabWeek').onclick = () => generateTrends('week');
+document.getElementById('tabMonth').onclick = () => generateTrends('month');
+
+function generateTrends(type) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab' + type.charAt(0).toUpperCase() + type.slice(1)).classList.add('active');
+    
+    const list = document.getElementById('trendsList');
+    list.innerHTML = '';
+    const groups = {};
+
+    flightLogs.forEach(log => {
+        const d = new Date(log.ts);
+        let key;
+        if (type === 'day') key = d.toLocaleDateString('default', { weekday: 'short', month: 'short', day: 'numeric' });
+        else if (type === 'week') {
+            const oneJan = new Date(d.getFullYear(), 0, 1);
+            key = `Week ${Math.ceil((((d - oneJan) / 86400000) + oneJan.getDay() + 1) / 7)}, ${d.getFullYear()}`;
+        } else key = d.toLocaleString('default', { month: 'long', year: 'numeric' });
+        groups[key] = (groups[key] || 0) + log.dur;
+    });
+
+    const sorted = Object.keys(groups).reverse();
+    sorted.forEach((k, i) => {
+        const cur = groups[k], prev = sorted[i+1] ? groups[sorted[i+1]] : null;
+        let arrow = '';
+        if (prev !== null) arrow = cur > prev ? '<span class="trend-up">▲</span>' : (cur < prev ? '<span class="trend-down">▼</span>' : '');
+        const div = document.createElement('div');
+        div.className = 'month-item';
+        div.innerHTML = `<span class="month-name">${k}</span><span class="month-val">${formatDur(cur)} ${arrow}</span>`;
+        list.appendChild(div);
+    });
+}
 
 document.getElementById('addTaskBtn').onclick = () => {
     let inp = document.getElementById('newTask'), val = inp.value.trim();
@@ -64,7 +119,7 @@ function getDist(c1, c2) { let R=6371, dLat=(c2[0]-c1[0])*Math.PI/180, dLon=(c2[
 function updateUI() {
     if(!isPaused) secondsLeft = Math.max(0, Math.round((endTime - Date.now())/1000));
     let h=Math.floor(secondsLeft/3600), m=Math.floor((secondsLeft%3600)/60), s=secondsLeft%60;
-    document.getElementById('timeRemaining').innerText = h>0?`${h}h ${m}m ${s}s`:`${m}m ${s}s`;
+    document.getElementById('timeRemaining').innerText = h>0 ? `${h}h ${m}m ${s}s` : `${m}m ${s}s`;
     document.getElementById('distRemaining').innerText = `${Math.round(totalDist*(secondsLeft/totalSeconds))} km`;
     let now=new Date(); document.getElementById('currentTime').innerText = now.getHours().toString().padStart(2,'0')+":"+now.getMinutes().toString().padStart(2,'0');
 }
@@ -72,11 +127,11 @@ function updateUI() {
 document.getElementById('startBtn').onclick = () => {
     let sCity = document.getElementById('startCity').value, eCity = document.getElementById('endCity').value;
     let s = locations[sCity], e = locations[eCity];
-    if(!s || !e) return alert("Invalid Cities");
+    if(!s || !e) return alert("Select valid cities!");
     document.getElementById('setupPanel').classList.add('hidden');
     document.getElementById('ifeBar').classList.remove('hidden');
     totalDist = getDist(s, e); let rot = getBearing(s, e);
-    totalSeconds = Math.round((totalDist/880)*3600); endTime = Date.now() + totalSeconds*1000; isPaused = false;
+    totalSeconds = Math.round((totalDist/880)*3600); endTime = Date.now() + totalSeconds*1000;
     if(flightPath) map.removeLayer(flightPath); flightPath = L.polyline([s,e], {color:'#00ffff',weight:2,dashArray:'10,10',opacity:0.5}).addTo(map);
     if(planeMarker) map.removeLayer(planeMarker);
     planeMarker = L.marker(s, {icon: L.divIcon({className:'p', html:`<div class="plane-icon" style="transform:rotate(${rot-90}deg)"><svg viewBox="0 0 24 24"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"></path></svg></div>`, iconSize:[45,45], iconAnchor:[22,22]})}).addTo(map);
@@ -86,7 +141,7 @@ document.getElementById('startBtn').onclick = () => {
             updateUI(); let progress = 1-(secondsLeft/totalSeconds);
             let lat = s[0]+(e[0]-s[0])*progress, lng = s[1]+(e[1]-s[1])*progress;
             planeMarker.setLatLng([lat,lng]); map.panTo([lat,lng]);
-            if(secondsLeft <= 0){ saveFlight(totalSeconds); alert("Arrival."); location.reload(); }
+            if(secondsLeft <= 0){ endTime = 0; saveFlight(totalSeconds); alert("Arrival."); location.reload(); }
         }
     }, 1000);
 };
@@ -97,3 +152,7 @@ document.getElementById('pauseBtn').onclick = () => {
     else endTime = Date.now() + pausedRemaining;
     document.getElementById('pauseBtn').innerText = isPaused ? "▶" : "⏸";
 };
+
+document.getElementById('clearLogsBtn').onclick = () => { if(confirm("Reset History?")){ flightLogs=[]; localStorage.removeItem('flightFocusLogs'); displayLogs(); } };
+
+displayLogs();
