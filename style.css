@@ -6,27 +6,39 @@ body, html {
 #map { height: 100vh; width: 100vw; z-index: 1; background: #0b0d12; }
 
 .todo-container, .log-container {
-    position: absolute; width: 250px; z-index: 1500; 
+    position: absolute; width: 260px; z-index: 1500; 
     background: rgba(15, 23, 42, 0.85); padding: 20px; 
     border-radius: 16px; border: 1px solid rgba(255,255,255,0.1);
     backdrop-filter: blur(12px); color: white;
 }
 .todo-container { top: 20px; left: 20px; }
-.log-container { top: 20px; right: 20px; font-size: 13px; }
+.log-container { top: 20px; right: 20px; }
 
 h3 { margin: 0 0 12px 0; font-size: 10px; letter-spacing: 2px; color: #94a3b8; text-transform: uppercase; }
 
-#taskList { list-style: none; padding: 0; margin: 0; max-height: 150px; overflow-y: auto; }
-#taskList li { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.task-content { display: flex; align-items: center; gap: 10px; }
+#taskList, .monthly-list { list-style: none; padding: 0; margin: 0; max-height: 180px; overflow-y: auto; }
+#taskList li, .month-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.task-content { display: flex; align-items: center; gap: 10px; font-size: 14px; }
 .delete-task-btn { background: none; border: none; color: #64748b; cursor: pointer; font-size: 18px; }
-.delete-task-btn:hover { color: #ef4444; }
 
-.stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.stat-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 13px; }
 .stat-row span:last-child { font-weight: bold; color: #22c55e; }
-.stat-row.total span:last-child { color: #00ffff; }
+.total span:last-child { color: #00ffff !important; }
 hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0; }
-#clearLogsBtn { background: none; border: 1px solid #444; color: #666; font-size: 9px; cursor: pointer; width: 100%; padding: 4px; border-radius: 4px; }
+
+.insights-tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+.tab-btn { flex: 1; background: rgba(255,255,255,0.05); border: 1px solid #334155; color: #94a3b8; font-size: 10px; padding: 5px; cursor: pointer; border-radius: 4px; }
+.tab-btn.active { background: #2563eb; color: white; border-color: #2563eb; }
+
+.month-name { font-size: 12px; color: #94a3b8; }
+.month-val { font-size: 12px; font-weight: bold; }
+.trend-up { color: #22c55e; margin-left: 4px; }
+.trend-down { color: #ef4444; margin-left: 4px; }
+
+#toggleInsightsBtn, #backToLogsBtn, #clearLogsBtn { 
+    background: rgba(255,255,255,0.05); border: 1px solid #334155; color: #fff; 
+    font-size: 10px; padding: 6px; width: 100%; cursor: pointer; border-radius: 4px; margin-top: 5px; 
+}
 
 .setup-panel {
     position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
@@ -34,7 +46,7 @@ hr { border: 0; border-top: 1px solid rgba(255,255,255,0.1); margin: 10px 0; }
     text-align: center; color: white; width: 320px; box-shadow: 0 20px 50px rgba(0,0,0,0.8);
 }
 .input-group input { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #334155; background: #0f172a; color: white; box-sizing: border-box; }
-button#startBtn { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 10px; }
+#startBtn { width: 100%; padding: 14px; background: #2563eb; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; margin-top: 10px; }
 
 .ife-bar {
     position: absolute; bottom: 0; left: 0; width: 100%; height: 140px; z-index: 1000;
@@ -45,7 +57,7 @@ button#startBtn { width: 100%; padding: 14px; background: #2563eb; color: white;
 .ife-bar * { pointer-events: auto; }
 .value { font-size: 32px; font-weight: 700; }
 .clock { display: block; font-size: 18px; color: #94a3b8; margin-bottom: 10px; }
-#pauseBtn { background: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; }
+#pauseBtn { background: #fff; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 18px; }
 
 .p { border: none !important; background: none !important; }
 .plane-icon { width: 45px; height: 45px; filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3)); transition: transform 0.5s ease; display: inline-block; }
